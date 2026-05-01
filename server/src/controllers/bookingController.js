@@ -1,6 +1,4 @@
 const Booking = require('../models/bookingModel');
-const db = require('../config/db'); 
-
 
 const createBooking = async (req, res) => {
     try {
@@ -24,10 +22,10 @@ const createBooking = async (req, res) => {
     }
 };
 
-
+// İstifadəçinin öz sifarişlərini gətirmək
 const getMyBookings = async (req, res) => {
     try {
-        const userId = req.user.id; 
+        const userId = req.user.id; // Token-dən gələn istifadəçi ID-si
         const [rows] = await db.execute(
             'SELECT * FROM bookings WHERE user_id = ?',
             [userId]
