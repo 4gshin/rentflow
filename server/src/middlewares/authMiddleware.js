@@ -8,10 +8,10 @@ const protect = async (req, res, next) => {
           
             token = req.headers.authorization.split(' ')[1];
 
-            // Verify token
+         
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            // Add user data to request object
+            
             req.user = decoded;
 
             next(); 
