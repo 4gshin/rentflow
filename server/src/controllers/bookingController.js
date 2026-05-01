@@ -22,4 +22,19 @@ const createBooking = async (req, res) => {
     }
 };
 
-module.exports = { createBooking };
+// İstifadəçinin öz sifarişlərini gətirmək
+const getMyBookings = async (req, res) => {
+    try {
+        const userId = req.user.id; // Token-dən gələn istifadəçi ID-si
+        const [rows] = await db.execute(
+            'SELECT * FROM bookings WHERE user_id = ?',
+            [userId]
+        );
+        res.status(200).json(rows);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching bookings", error: error.message });
+    }
+};
+
+module.exports = { createBooking, 
+    getMyBookings };
