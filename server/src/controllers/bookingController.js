@@ -22,10 +22,9 @@ const createBooking = async (req, res) => {
     }
 };
 
-// İstifadəçinin öz sifarişlərini gətirmək
 const getMyBookings = async (req, res) => {
     try {
-        const userId = req.user.id; // Token-dən gələn istifadəçi ID-si
+        const userId = req.user.id; 
         const [rows] = await db.execute(
             'SELECT * FROM bookings WHERE user_id = ?',
             [userId]
@@ -36,5 +35,20 @@ const getMyBookings = async (req, res) => {
     }
 };
 
-module.exports = { createBooking, 
-    getMyBookings };
+const getAllBookings = async (req, res) => {
+    try {
+        const [rows] = await db.execute(`
+            SELECT b.*, u.full_name as customer_name, c.brand, c.model 
+            FROM bookings b
+            JOIN users u ON b.user_id = u.id
+            JOIN cars c ON b.car_id = c.id
+            ORDER BY b.created_at DESC
+        `);
+        res.status(200).json(rows);
+    } catch (error) {
+        res.status(500).json({ message: "Admin Error: Fetching all bookings failed", error: error.message });
+    }
+};
+
+module.exports = { createBooking, getMyBookings, getAllBookings };
+
