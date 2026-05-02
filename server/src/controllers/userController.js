@@ -1,59 +1,63 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+// 1. Register User
 const registerUser = async (req, res) => {
     try {
-        const { full_name, email, password } = req.body;
+        // Frontend-den 'name' gelirse onu 'full_name' kimi qebul edek
+        const { name, email, password } = req.body;
+        const full_name = name; 
 
-        // Test mail for validation
+        // Email yoxlanışı
         const userExists = await User.findByEmail(email);
         if (userExists) {
             return res.status(400).json({ message: "This email is already registered." });
         }
 
-        // 2. Password hashing
+        // Şifrənin hash-lənməsi
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // 3. Create user in the database
+        // Bazada istifadəçi yaratmaq
         const userId = await User.create({
             full_name,
             email,
             password: hashedPassword
         });
 
-        res.status(201).json({ message: "User created successfully!", userId });
+        res.status(201).json({ 
+            message: "User created successfully!", 
+            userId 
+        });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error });
+        console.error("REGISTER ERROR:", error); // Terminalda deqiq xetani goreceksen
+        res.status(500).json({ message: "Server error during registration", error: error.message });
     }
 };
 
-module.exports = { registerUser };
-
-const jwt = require('jsonwebtoken');
-
-// Login user
+// 2. Login User
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // 1. Find user by email
+        // Email-e gore user tapmaq
         const user = await User.findByEmail(email);
         if (!user) {
-            return res.status(401).json({ message: "Invalid credentials" });
+            return res.status(401).json({ message: "Invalid credentials (Email not found)" });
         }
 
-        // 2. Compare password with hashed password in DB
+        // Şifrə müqayisəsi
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(401).json({ message: "Invalid credentials" });
+            return res.status(401).json({ message: "Invalid credentials (Wrong password)" });
         }
 
-        // 3. Create JWT Token
+        // JWT Token yaradılması
         const token = jwt.sign(
             { id: user.id, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: '1d' } // Token lasts for 1 day
+            { expiresIn: '1d' }
         );
 
         res.json({
@@ -67,9 +71,10 @@ const loginUser = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error });
+        console.error("LOGIN ERROR:", error);
+        res.status(500).json({ message: "Server error during login", error: error.message });
     }
 };
 
-// Don't forget to export it
+// CRITICAL: Export her iki funksiyani bir yerde etmelidir!
 module.exports = { registerUser, loginUser };
