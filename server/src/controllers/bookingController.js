@@ -49,6 +49,27 @@ const getAllBookings = async (req, res) => {
         res.status(500).json({ message: "Admin Error: Fetching all bookings failed", error: error.message });
     }
 };
+const updateBookingStatus = async (req, res) => {
+    try {
+        const { id } = req.params; 
+        const { status } = req.body; 
 
-module.exports = { createBooking, getMyBookings, getAllBookings };
+        const [result] = await db.execute(
+            'UPDATE bookings SET status = ? WHERE id = ?',
+            [status, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Booking not found" });
+        }
+
+        res.status(200).json({ message: `Booking status updated to ${status}` });
+    } catch (error) {
+        res.status(500).json({ message: "Update failed", error: error.message });
+    }
+};
+
+module.exports = { createBooking, getMyBookings, getAllBookings, updateBookingStatus };
+
+
 
