@@ -2,16 +2,21 @@ const express = require('express');
 const cors = require('cors');
 const carRoutes = require('./routes/carRoutes');
 const userRoutes = require('./routes/userRoutes'); 
-const bookingRoutes = require('./routes/bookingRoutes'); // 1. Import et
+const bookingRoutes = require('./routes/bookingRoutes');
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+// Middleware
+app.use(cors()); 
+app.use(express.json()); 
 
-// 2. API yollarını təyin et
+// API Routes
 app.use('/api/cars', carRoutes);
 app.use('/api/users', userRoutes); 
-app.use('/api/bookings', bookingRoutes); // Bura əlavə olundu
+app.use('/api/bookings', bookingRoutes);
+
+app.get('/', (req, res) => {
+    res.send('RentFlow API is running...');
+});
 
 module.exports = app;

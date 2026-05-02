@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Register from './pages/Register'; // Yeni əlavə olundu
 import CarDetails from './pages/CarDetails';
 
 function App() {
@@ -13,8 +14,9 @@ function App() {
             RENTFLOW
           </Link>
           
-          <div className="flex items-center space-x-8 font-medium text-sm">
+          <div className="flex items-center space-x-6 font-medium text-sm">
             <Link to="/" className="hover:text-blue-600 transition">Fleet</Link>
+            <Link to="/register" className="hover:text-blue-600 transition">Register</Link> {/* Yeni link */}
             <Link 
               to="/login" 
               className="px-6 py-2.5 bg-black text-white rounded-xl hover:bg-gray-800 transition shadow-lg shadow-gray-200"
@@ -29,6 +31,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} /> {/* Yeni route */}
             <Route path="/car/:id" element={<CarDetails />} />
           </Routes>
         </main>
