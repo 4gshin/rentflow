@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Home = () => {
@@ -17,36 +18,52 @@ const Home = () => {
     }, []);
 
     return (
-        <div className="p-8 bg-gray-50 min-h-screen font-sans">
-            <header className="mb-12">
-                <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Available Fleet</h1>
-                <p className="text-gray-500 mt-2">Choose the best car for your next journey.</p>
+        <div className="min-h-screen bg-[#FBFBFD] px-6">
+            {/* Hero Section */}
+            <header className="py-20 text-center">
+                <h1 className="text-6xl font-black tracking-tighter text-[#1D1D1F] mb-4">
+                    The Fleet.
+                </h1>
+                <p className="text-xl text-gray-500 font-medium max-w-2xl mx-auto">
+                    Experience the perfect blend of performance and luxury for your next journey.
+                </p>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Car Grid */}
+            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 pb-20">
                 {cars.map(car => (
-                    <div key={car.id} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
-                        <div className="h-40 bg-gray-200 rounded-2xl mb-4 flex items-center justify-center text-gray-400">
-                            {/* We will add images later */}
-                            No Image Available
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-800">{car.brand} {car.model}</h2>
-                        <div className="flex items-center gap-2 mt-2">
-                            <span className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-full uppercase">
-                                {car.year}
-                            </span>
-                            <span className="text-gray-400 text-sm">{car.plate_number}</span>
-                        </div>
+                    <div key={car.id} className="group bg-white rounded-[2.5rem] p-8 border border-gray-100 hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 flex flex-col justify-between">
                         
-                        <div className="mt-8 flex justify-between items-center border-t pt-4">
-                            <div>
-                                <span className="text-2xl font-bold text-black">${car.daily_price}</span>
-                                <span className="text-gray-500 text-sm"> / day</span>
-                            </div>
-                            <button className="bg-black text-white px-6 py-3 rounded-xl font-medium hover:bg-gray-800 transition">
-                                Rent Now
-                            </button>
+                        {/* Image Placeholder - Bura sonra G20 şəkli qoyacağıq */}
+                        <div className="h-48 bg-[#F5F5F7] rounded-3xl mb-8 flex items-center justify-center overflow-hidden">
+                            <span className="text-gray-300 font-bold tracking-widest uppercase text-xs group-hover:scale-110 transition-transform duration-500">
+                                {car.brand} {car.model} Image
+                            </span>
                         </div>
+
+                        <div>
+                            <div className="flex justify-between items-start mb-4">
+                                <h2 className="text-3xl font-bold tracking-tight text-[#1D1D1F]">
+                                    {car.brand} <span className="block text-gray-400 text-2xl">{car.model}</span>
+                                </h2>
+                                <span className="bg-blue-50 text-[#0071E3] px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                                    {car.year}
+                                </span>
+                            </div>
+
+                            <div className="flex items-baseline gap-1 mb-8">
+                                <span className="text-4xl font-bold text-black">${car.daily_price}</span>
+                                <span className="text-gray-400 font-medium">/day</span>
+                            </div>
+                        </div>
+
+                        {/* Rent Now Button - İndi artıq işləyir! */}
+                        <Link 
+                            to={`/car/${car.id}`}
+                            className="w-full bg-[#1D1D1F] text-white py-5 rounded-2xl font-bold text-center hover:bg-[#0071E3] transition-colors duration-300 shadow-xl shadow-gray-200"
+                        >
+                            Rent Now
+                        </Link>
                     </div>
                 ))}
             </div>
