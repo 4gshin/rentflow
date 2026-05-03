@@ -9,7 +9,6 @@ import CarDetails from './pages/CarDetails';
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
 
-  // Token deyişende interfeysi yenilemek üçün
   useEffect(() => {
     const handleStorage = () => setToken(localStorage.getItem('token'));
     window.addEventListener('storage', handleStorage);
@@ -25,27 +24,33 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-[#FBFBFD] font-sans text-[#1D1D1F]">
-        <nav className="px-10 py-5 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
-          <Link to="/" className="text-2xl font-black tracking-tighter text-black">
+      {/* Şəkildəki o dar çərçivəni və bənövşəyi linkləri bu klasslar yox edir */}
+      <div className="min-h-screen bg-[#FBFBFD] flex flex-col">
+        
+        {/* Navigation Bar */}
+        <nav className="h-20 px-12 flex justify-between items-center bg-white/90 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
+          <Link to="/" className="text-2xl font-black tracking-tighter text-black no-underline">
             RENTFLOW
           </Link>
           
-          <div className="flex items-center space-x-10 font-medium text-[13px] tracking-wide">
-            <Link to="/" className="hover:text-blue-600 transition">FLEET</Link>
-            {token && <Link to="/profile" className="hover:text-blue-600 transition">MY GARAGE</Link>}
+          <div className="flex items-center gap-10">
+            <Link to="/" className="nav-link">FLEET</Link>
+            
+            {token && (
+              <Link to="/profile" className="nav-link">MY GARAGE</Link>
+            )}
             
             {token ? (
               <button 
                 onClick={handleLogout}
-                className="px-5 py-2 bg-red-50 text-red-600 rounded-full hover:bg-red-100 transition"
+                className="px-6 py-2 bg-gray-100 text-[#1D1D1F] text-[12px] font-bold rounded-full hover:bg-red-50 hover:text-red-600 transition-all uppercase tracking-widest"
               >
                 Logout
               </button>
             ) : (
               <Link 
                 to="/login" 
-                className="px-6 py-2 bg-[#0071E3] text-white rounded-full hover:bg-[#0077ED] transition shadow-md shadow-blue-100"
+                className="px-8 py-2.5 bg-[#0071E3] text-white text-[12px] font-bold rounded-full no-underline hover:bg-[#0077ED] transition shadow-lg shadow-blue-200 uppercase tracking-widest"
               >
                 Login
               </Link>
@@ -53,7 +58,8 @@ function App() {
           </div>
         </nav>
 
-        <main className="max-w-7xl mx-auto py-12 px-6">
+        {/* Main Content Area */}
+        <main className="flex-1 w-full max-w-none">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -62,6 +68,13 @@ function App() {
             <Route path="/car/:id" element={<CarDetails />} />
           </Routes>
         </main>
+
+        {/* Footer */}
+        <footer className="py-12 border-t border-gray-100 bg-white text-center">
+          <p className="text-[12px] text-gray-400 font-medium tracking-wide uppercase">
+            © 2026 RentFlow. All rights reserved.
+          </p>
+        </footer>
       </div>
     </Router>
   );
