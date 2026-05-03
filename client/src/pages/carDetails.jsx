@@ -17,22 +17,28 @@ const CarDetails = () => {
     }, [id]);
 
     const handleBooking = async () => {
-        const token = localStorage.getItem('token');
-        if (!token) return alert("Please login first!");
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert("Please login to rent a car!");
+        return;
+    }
 
-        try {
-            await axios.post('http://localhost:5002/api/bookings', {
-                car_id: id,
-                start_date: startDate,
-                end_date: endDate
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            alert("Booking successful!");
-        } catch (error) {
-            alert(error.response?.data?.message || "Booking failed");
-        }
-    };
+    try {
+        const res = await axios.post('http://localhost:5002/api/bookings', {
+            car_id: id,
+            start_date: startDate,
+            end_date: endDate
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        alert(res.data.message);
+        // Sifariş uğurlu olsa, istifadəçini ana səhifəyə qaytaraq
+        window.location.href = '/'; 
+    } catch (error) {
+        alert(error.response?.data?.message || "Something went wrong");
+    }
+};
 
     if (!car) return <div className="p-10 text-center">Loading...</div>;
 

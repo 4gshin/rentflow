@@ -69,6 +69,39 @@ const updateBookingStatus = async (req, res) => {
     }
 };
 
+const db = require('../config/db');
+
+const createBooking = async (req, res) => {
+    try {
+        const { car_id, start_date, end_date } = req.body;
+        const user_id = req.user.id; // JWT-den gelen user id
+
+        // 1. Maşının həmin tarixlərdə boş olub-olmadığını yoxlayan SQL (Overlap check)
+        const [existing] = await db.execute(
+            `SELECT * FROM bookings 
+             WHERE car_id = ? AND 
+             ((start_date <= ? AND end_date >= ?) OR (start_date <= ? AND end_date >= ?))`,
+            [car_id, end_date, start_date, start_date, end_date]
+        );
+
+        if (existing.length > 0) {
+            return res.status(400).json({ message: "Car is already booked for these dates!" });
+        }
+
+        // 2. Əgər boşdursa, sifarişi yarat
+        await db.execute(
+            'INSERT INTO bookings (user_id, car_id, start_date, end_date, status) VALUES (?, ?, ?, ?, ?)',
+            [user_id, car_id, start_date, end_date, 'confirmed']
+        );
+
+        res.status(201).json({ message: "Booking successful! Enjoy your ride." });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+
 module.exports = { createBooking, getMyBookings, getAllBookings, updateBookingStatus };
 
 
