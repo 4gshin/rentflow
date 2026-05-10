@@ -10,9 +10,12 @@ const Login = () => {
         e.preventDefault();
         try {
             const res = await axios.post('http://localhost:5002/api/users/login', { email, password });
-            localStorage.setItem('token', res.data.token);
             
-            toast.success(`Welcome back!`, {
+            
+            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('user', JSON.stringify(res.data.user)); 
+            
+            toast.success(`Welcome back, ${res.data.user.full_name}!`, {
                 icon: '👋',
                 style: { borderRadius: '15px', background: '#1D1D1F', color: '#fff' }
             });
@@ -29,9 +32,21 @@ const Login = () => {
                 <h2 className="text-3xl font-black text-center mb-2 tracking-tighter">Sign In</h2>
                 <p className="text-gray-500 text-center mb-8 font-medium">Manage your premium rentals.</p>
                 <form onSubmit={handleLogin} className="space-y-6">
-                    <input type="email" className="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-black font-medium" placeholder="Email Address" onChange={(e) => setEmail(e.target.value)} />
-                    <input type="password" className="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-black font-medium" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
-                    <button className="w-full bg-black text-white p-5 rounded-2xl font-black hover:bg-[#0071E3] transition-all shadow-lg">Login</button>
+                    <input 
+                        type="email" 
+                        className="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-black font-medium transition-all" 
+                        placeholder="Email Address" 
+                        onChange={(e) => setEmail(e.target.value)} 
+                    />
+                    <input 
+                        type="password" 
+                        className="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-black font-medium transition-all" 
+                        placeholder="Password" 
+                        onChange={(e) => setPassword(e.target.value)} 
+                    />
+                    <button className="w-full bg-black text-white p-5 rounded-2xl font-black hover:bg-[#0071E3] transition-all shadow-lg active:scale-95">
+                        Login
+                    </button>
                 </form>
             </div>
         </div>

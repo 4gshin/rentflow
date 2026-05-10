@@ -55,18 +55,29 @@ const createBooking = async (req, res) => {
 
 const getMyBookings = async (req, res) => {
     try {
-        const userId = req.user.id; 
+        // req.user.id-ni mütləq rəqəmə çeviririk
+        const userId = parseInt(req.user.id); 
+        
+        // Terminala bax: Buradakı rəqəm 1-dirmi?
+        console.log("----------------------------");
+        console.log("LOGGED IN USER ID:", userId);
+        console.log("----------------------------");
+
         const [rows] = await db.execute(
-            `SELECT b.*, c.brand, c.model, c.price_per_day 
+            `SELECT b.id, b.start_date, b.end_date, b.total_price, b.status, 
+                    c.brand, c.model 
              FROM bookings b
              JOIN cars c ON b.car_id = c.id
              WHERE b.user_id = ? 
-             ORDER BY b.start_date DESC`,
+             ORDER BY b.created_at DESC`,
             [userId]
         );
+
+        console.log("FOUND ROWS FOR THIS USER:", rows.length);
         res.status(200).json(rows);
     } catch (error) {
-        res.status(500).json({ message: "Error fetching your bookings", error: error.message });
+        console.error("GET MY BOOKINGS ERROR:", error);
+        res.status(500).json({ message: "Error fetching bookings" });
     }
 };
 

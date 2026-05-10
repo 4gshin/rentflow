@@ -12,8 +12,9 @@ const { protect, isAdmin } = require('../middlewares/authMiddleware');
 
 // --- Routes ---
 
+router.get('/my', protect, getMyBookings);
+
 router.post('/', protect, createBooking);
-router.get('/my-bookings', protect, getMyBookings);
 router.get('/admin/all', protect, isAdmin, getAllBookings);
 router.put('/:id/status', protect, isAdmin, updateBookingStatus);
 
