@@ -1,11 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { Toaster } from 'react-hot-toast'; // Əlavə olundu
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import CarDetails from './pages/CarDetails';
-import About from './pages/About'; // Yeni yaratdığımız səhifə
+import About from './pages/About';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -26,15 +27,15 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-[#FBFBFD] flex flex-col font-sans antialiased">
+        {/* Toast Bildirişləri üçün konteyner */}
+        <Toaster position="top-right" reverseOrder={false} />
         
-        {/* Apple-Style Navigation Bar */}
         <nav className="h-16 px-6 md:px-12 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
           <div className="flex items-center gap-12">
             <Link to="/" className="text-xl font-black tracking-tighter text-black no-underline hover:opacity-70 transition-opacity">
               RENTFLOW
             </Link>
             
-            {/* Desktop Links */}
             <div className="hidden md:flex items-center gap-8">
               <Link to="/" className="text-[12px] font-bold text-[#1D1D1F] no-underline tracking-widest uppercase hover:text-[#0071E3] transition-colors">
                 Fleet
@@ -74,7 +75,6 @@ function App() {
           </div>
         </nav>
 
-        {/* Main Content Area */}
         <main className="flex-1 w-full overflow-x-hidden">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -86,23 +86,18 @@ function App() {
           </Routes>
         </main>
 
-        {/* Footer */}
         <footer className="py-20 bg-white border-t border-gray-100 px-6">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="text-left">
               <h2 className="text-2xl font-black tracking-tighter mb-2">RENTFLOW</h2>
               <p className="text-sm text-gray-400 font-medium">The future of premium car rentals.</p>
             </div>
-            
             <div className="flex gap-10 text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">
               <Link to="/" className="hover:text-black no-underline">Fleet</Link>
               <Link to="/about" className="hover:text-black no-underline">About</Link>
               <span className="cursor-default">Privacy</span>
             </div>
-
-            <p className="text-[10px] text-gray-300 font-bold tracking-widest uppercase">
-              © 2026 RentFlow Studio.
-            </p>
+            <p className="text-[10px] text-gray-300 font-bold tracking-widest uppercase">© 2026 RentFlow Studio.</p>
           </div>
         </footer>
       </div>
