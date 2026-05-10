@@ -10,7 +10,7 @@ const Login = () => {
         try {
             const res = await axios.post('http://localhost:5002/api/users/login', { email, password });
             localStorage.setItem('token', res.data.token);
-            alert('Welcome back, Agshin!'); // We will replace this with a better notification later
+            alert('Welcome back!'); // We will replace this with a better notification later
             window.location.href = '/';
         } catch (error) {
             alert('Login failed. Please check your credentials.');
