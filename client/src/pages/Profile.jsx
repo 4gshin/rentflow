@@ -3,53 +3,59 @@ import axios from 'axios';
 
 const Profile = () => {
     const [bookings, setBookings] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const user = JSON.parse(localStorage.getItem('user'));
 
     useEffect(() => {
         const fetchMyBookings = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const res = await axios.get('http://localhost:5002/api/bookings/my-bookings', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setBookings(res.data);
-            } catch (error) {
-                console.error("Profile error:", error);
-            } finally {
-                setLoading(false);
-            }
+            const token = localStorage.getItem('token');
+            const res = await axios.get('http://localhost:5002/api/bookings/my', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setBookings(res.data);
         };
         fetchMyBookings();
     }, []);
 
-    if (loading) return <div className="p-10 text-center font-medium">Loading...</div>;
-
     return (
-        <div className="max-w-4xl mx-auto p-6">
-            <h1 className="text-4xl font-black mb-10 tracking-tighter uppercase">My Garage</h1>
-            
-            <div className="space-y-4">
-                {bookings.length > 0 ? bookings.map((b) => (
-                    <div key={b.id} className="bg-white border border-gray-100 p-6 rounded-3xl shadow-sm flex justify-between items-center">
-                        <div>
-                            <h3 className="text-xl font-bold">{b.brand} {b.model}</h3>
-                            <p className="text-gray-400 text-sm font-medium">
-                                {new Date(b.start_date).toLocaleDateString()} — {new Date(b.end_date).toLocaleDateString()}
-                            </p>
-                        </div>
-                        <div className="text-right">
-                            <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest ${
-                                b.status === 'confirmed' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'
+        <div className="min-h-screen bg-[#FBFBFD] p-12">
+            <header className="max-w-6xl mx-auto mb-20">
+                <h1 className="text-7xl font-black tracking-tighter text-black mb-4">My Garage.</h1>
+                <p className="text-xl text-gray-400 font-medium tracking-tight">Welcome back, {user?.full_name || 'Driver'}. Here are your active rentals.</p>
+            </header>
+
+            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                {bookings.map(booking => (
+                    <div key={booking.id} className="bg-white rounded-[3rem] p-10 shadow-xl border border-gray-50 flex flex-col justify-between group hover:scale-[1.02] transition-all duration-500">
+                        <div className="flex justify-between items-start mb-10">
+                            <div>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2 block">Rental Ticket</span>
+                                <h2 className="text-4xl font-black tracking-tighter">{booking.brand} <span className="text-gray-300">{booking.model}</span></h2>
+                            </div>
+                            <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                booking.status === 'pending' ? 'bg-yellow-50 text-yellow-600' : 'bg-green-50 text-green-600'
                             }`}>
-                                {b.status}
+                                {booking.status}
                             </span>
                         </div>
+
+                        <div className="space-y-6">
+                            <div className="flex justify-between border-b border-gray-50 pb-4">
+                                <span className="text-gray-400 font-bold text-xs uppercase tracking-widest">Period</span>
+                                <span className="font-bold text-sm">
+                                    {new Date(booking.start_date).toLocaleDateString()} — {new Date(booking.end_date).toLocaleDateString()}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-400 font-bold text-xs uppercase tracking-widest">Total Paid</span>
+                                <span className="text-3xl font-black text-black">${booking.total_price}</span>
+                            </div>
+                        </div>
+
+                        <button className="mt-10 w-full py-4 bg-gray-50 text-gray-400 rounded-2xl font-black text-xs uppercase tracking-widest group-hover:bg-red-50 group-hover:text-red-500 transition-all">
+                            Cancel Reservation
+                        </button>
                     </div>
-                )) : (
-                    <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                        <p className="text-gray-400 font-medium">You haven't rented any cars yet.</p>
-                    </div>
-                )}
+                ))}
             </div>
         </div>
     );
