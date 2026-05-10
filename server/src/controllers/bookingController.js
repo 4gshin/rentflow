@@ -6,7 +6,6 @@ const createBooking = async (req, res) => {
         const { car_id, start_date, end_date } = req.body;
         const user_id = req.user.id; 
 
-        // A. Maşının qiymətini bazadan götürək (Səndəki sütun adı: price_per_day)
         const [carRows] = await db.execute('SELECT price_per_day FROM cars WHERE id = ?', [car_id]);
         
         if (carRows.length === 0) {
@@ -23,7 +22,7 @@ const createBooking = async (req, res) => {
         // C. Ümumi qiyməti hesablayaq
         const total_price = diffDays * dailyPrice;
 
-        // D. 🛡️ Overlap yoxlanışı
+        // D.  Overlap yoxlanışı
         const [existing] = await db.execute(
             `SELECT * FROM bookings 
              WHERE car_id = ? AND 
@@ -36,7 +35,7 @@ const createBooking = async (req, res) => {
             return res.status(400).json({ message: "Car is already booked for these dates!" });
         }
 
-        // E. 🚀 Sifarişi bazaya yazırıq
+        // E.  Sifarişi bazaya yazırıq
         await db.execute(
             'INSERT INTO bookings (user_id, car_id, start_date, end_date, total_price, status) VALUES (?, ?, ?, ?, ?, ?)',
             [user_id, car_id, start_date, end_date, total_price, 'pending']
@@ -53,7 +52,7 @@ const createBooking = async (req, res) => {
     }
 };
 
-// Digər funksiyalar (getMyBookings, getAllBookings və s.) eyni qalır...
+
 const getMyBookings = async (req, res) => {
     try {
         const userId = req.user.id; 
