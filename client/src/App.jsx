@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Toaster } from 'react-hot-toast'; // Əlavə olundu
+import { Toaster } from 'react-hot-toast';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -27,7 +27,6 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-[#FBFBFD] flex flex-col font-sans antialiased">
-        {/* Toast Bildirişləri üçün konteyner */}
         <Toaster position="top-right" reverseOrder={false} />
         
         <nav className="h-16 px-6 md:px-12 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
