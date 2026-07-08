@@ -17,7 +17,7 @@ const User = {
         return result.insertId;
     },
 
-    // 🟢 1. Find user by ID (Get Profile üçün)
+    // 🟢 1. Find user by ID (Get Profile üçün) 
     findById: async (id) => {
         const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
         return rows[0];
