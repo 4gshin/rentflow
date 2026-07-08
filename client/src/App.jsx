@@ -1,8 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { Toaster } from 'react-hot-toast';
-import axios from 'react-hot-toast'; 
-import axiosActual from 'axios'; // Real axios instansiyası
+import { Toaster, toast } from 'react-hot-toast';
+import axios from 'axios';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -15,7 +14,13 @@ function App() {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [profileData, setProfileData] = useState(null);
-  const [pastBookings, setPastBookings] = useState([]);
+  
+  // Edit State-ləri
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editBio, setEditBio] = useState('');
+
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -27,37 +32,55 @@ function App() {
     return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
+  // Dropdown açılanda canlı məlumatları çəkirik
   useEffect(() => {
     if (dropdownOpen && token) {
-      const fetchDropdownData = async () => {
-        try {
-          const profRes = await axiosActual.get('http://localhost:5002/api/users/profile', {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          setProfileData(profRes.data);
-
-          const bookRes = await axiosActual.get('http://localhost:5002/api/bookings/my', {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-
-          // 🔴 SMART FILTER: Statusu completed/rejected olanlar VƏ YA tarixi artıq keçmiş olan bütün rentləri bura yığırıq
-          const past = bookRes.data.filter(b => {
-            const isFinishedStatus = b.status === 'completed' || b.status === 'rejected';
-            const isPastDate = new Date(b.end_date) < today;
-            return isFinishedStatus || isPastDate;
-          });
-          
-          setPastBookings(past);
-        } catch (err) {
-          console.error("Dropdown data error:", err);
-        }
-      };
-      fetchDropdownData();
+      fetchProfileData();
+    } else {
+      setIsEditing(false); // Dropdown bağlananda edit rejimindən çıxırıq
     }
   }, [dropdownOpen, token]);
+
+  const fetchProfileData = async () => {
+    try {
+      const profRes = await axios.get('http://localhost:5002/api/users/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProfileData(profRes.data);
+      // Edit formunu doldururuq
+      setEditName(profRes.data.full_name || '');
+      setEditPhone(profRes.data.phone_number || '');
+      setEditBio(profRes.data.bio || '');
+    } catch (err) {
+      console.error("Dropdown profile data error:", err);
+    }
+  };
+
+  // İnline Profil Yeniləmə Logikası
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.put('http://localhost:5002/api/users/profile', {
+        full_name: editName,
+        phone_number: editPhone,
+        bio: editBio
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      toast.success("Profile synchronized!");
+      setIsEditing(false);
+      
+      // Lokal state-ləri yeniləyirik
+      const updatedUser = { ...user, full_name: editName };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      fetchProfileData();
+    } catch (err) {
+      console.error("Profile update error:", err);
+      toast.error("Failed to sync changes.");
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -85,17 +108,12 @@ function App() {
     return parts[0][0].toUpperCase();
   };
 
-  const formatDate = (dateStr) => {
-    const d = new Date(dateStr);
-    return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
-  };
-
   return (
     <Router>
       <div className="min-h-screen bg-[#FBFBFD] flex flex-col font-sans antialiased relative">
         <Toaster position="top-right" reverseOrder={false} />
         
-        <nav className="h-16 px-6 md:px-12 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+        <nav className="h-16 px-6 md:px-12 flex justify-between items-center bg-white/70 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 transition-all duration-300">
           <div className="flex items-center gap-12">
             <Link to="/" className="text-xl font-black tracking-tighter text-black no-underline hover:opacity-70 transition-opacity">
               RENTFLOW
@@ -140,37 +158,93 @@ function App() {
               </div>
             )}
 
-            {/* 💳 FACE CARD DROPDOWN */}
+            {/* 💳 PREMIUM FACE CARD DROPDOWN W/ INLINE EDIT */}
             {dropdownOpen && (
-              <div className="absolute right-0 top-14 w-80 bg-white rounded-[2rem] shadow-2xl border border-gray-100 p-6 z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-200">
+              <div className="absolute right-0 top-14 w-80 bg-white/95 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-gray-100 p-6 z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-200">
                 
-                <div className="pb-3 border-b border-gray-50 flex flex-col space-y-0.5">
-                  <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#0071E3]">Premium Member</span>
-                  <h4 className="text-lg font-black tracking-tight text-[#1D1D1F]">{profileData?.full_name || user?.full_name}</h4>
-                  <p className="text-xs text-gray-400 font-medium tracking-tight">{profileData?.email || user?.email}</p>
-                </div>
+                {!isEditing ? (
+                  /* 👁️ VIEW MODE: Məlumatların Göstərilməsi */
+                  <>
+                    <div className="pb-4 border-b border-gray-50 flex flex-col space-y-0.5">
+                      <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#0071E3]">Driver Identity</span>
+                      <h4 className="text-xl font-black tracking-tight text-[#1D1D1F]">{profileData?.full_name || user?.full_name}</h4>
+                      <p className="text-xs text-gray-400 font-medium tracking-tight">{profileData?.email || user?.email}</p>
+                    </div>
 
-                <div className="flex flex-col space-y-3">
-                  <h5 className="text-[9px] font-black uppercase tracking-widest text-gray-400">Past Rentals</h5>
-                  
-                  <div className="max-h-48 overflow-y-auto space-y-2 pr-1 no-scrollbar">
-                    {pastBookings.length > 0 ? (
-                      pastBookings.map(book => (
-                        <div key={book.id} className="bg-[#F5F5F7] px-4 py-3 rounded-2xl flex justify-between items-center border border-gray-50">
-                          <div className="space-y-0.5">
-                            <p className="text-xs font-bold text-[#1D1D1F]">{book.brand} <span className="font-medium text-gray-500">{book.model}</span></p>
-                            <p className="text-[10px] font-semibold text-gray-400">
-                              {formatDate(book.start_date)} — {formatDate(book.end_date)}
-                            </p>
-                          </div>
-                          <span className="text-xs font-black text-black bg-white px-2.5 py-1 rounded-lg border border-gray-100">${book.total_price}</span>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-xs font-medium text-gray-300 italic text-center py-4">No history records.</p>
-                    )}
-                  </div>
-                </div>
+                    <div className="space-y-3 text-xs text-[#1D1D1F]">
+                      <div className="bg-[#F5F5F7] px-4 py-3 rounded-2xl border border-gray-50">
+                        <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest block mb-0.5">Phone Line</span>
+                        <p className="font-bold">{profileData?.phone_number || "No contact line synced"}</p>
+                      </div>
+                      <div className="bg-[#F5F5F7] px-4 py-3 rounded-2xl border border-gray-50">
+                        <span className="text-[9px] font-black uppercase text-gray-400 tracking-widest block mb-0.5">Driver Bio</span>
+                        <p className="italic font-medium text-gray-600">"{profileData?.bio || "Premium Driver"}"</p>
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={() => setIsEditing(true)}
+                      className="w-full mt-2 bg-[#1D1D1F] text-white py-3.5 rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-[#0071E3] transition-all duration-300"
+                    >
+                      Settings / Edit
+                    </button>
+                  </>
+                ) : (
+                  /* 📝 EDIT MODE: İnline Forma Keçid */
+                  <form onSubmit={handleSaveProfile} className="space-y-4">
+                    <div className="pb-2 border-b border-gray-50">
+                      <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#0071E3]">Modify Account</span>
+                      <h4 className="text-md font-black tracking-tight text-[#1D1D1F]">Inline Settings</h4>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest block mb-1">Full Name</label>
+                        <input 
+                          type="text" 
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          className="w-full bg-[#F5F5F7] border border-transparent focus:border-gray-200 outline-none p-3 rounded-xl text-xs font-bold text-black"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest block mb-1">Phone Number</label>
+                        <input 
+                          type="text" 
+                          value={editPhone}
+                          onChange={(e) => setEditPhone(e.target.value)}
+                          placeholder="+994 (XX) XXX-XX-XX"
+                          className="w-full bg-[#F5F5F7] border border-transparent focus:border-gray-200 outline-none p-3 rounded-xl text-xs font-bold text-black"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[9px] font-black uppercase text-gray-400 tracking-widest block mb-1">Bio Description</label>
+                        <textarea 
+                          value={editBio}
+                          onChange={(e) => setEditBio(e.target.value)}
+                          className="w-full bg-[#F5F5F7] border border-transparent focus:border-gray-200 outline-none p-3 rounded-xl text-xs font-medium text-gray-700 h-16 resize-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <button 
+                        type="button"
+                        onClick={() => setIsEditing(false)}
+                        className="w-1/2 bg-gray-100 text-gray-500 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit"
+                        className="w-1/2 bg-[#0071E3] text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-colors"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                )}
 
               </div>
             )}
