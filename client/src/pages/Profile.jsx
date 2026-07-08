@@ -18,8 +18,16 @@ const Profile = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 
-                // 🔴 Filter: Yalnız davam edən və təsdiqlənmiş rentləri böyük qaraja salırıq
-                const active = res.data.filter(b => b.status === 'pending' || b.status === 'approved');
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Saatı sıfırlayırıq ki, düzgün müqayisə getsin
+
+                // 🔴 SMART FILTER: Yalnız statusu pending/approved olan VƏ bitmə tarixi bu gündən sonra olanları saxlayırıq
+                const active = res.data.filter(b => {
+                    const isPendingOrApproved = b.status === 'pending' || b.status === 'approved';
+                    const isFutureRental = new Date(b.end_date) >= today;
+                    return isPendingOrApproved && isFutureRental;
+                });
+                
                 setActiveBookings(active);
             } catch (err) {
                 console.error("Garage load error:", err);
@@ -45,7 +53,6 @@ const Profile = () => {
                 <p className="text-lg text-[#86868B] font-medium tracking-tight mt-2">Track your current premium driving sessions.</p>
             </header>
 
-            {/* Genişləndirilmiş təmiz cədvəl strukturu */}
             <div className="max-w-5xl mx-auto space-y-6">
                 {activeBookings.length > 0 ? (
                     activeBookings.map(booking => (
@@ -61,19 +68,20 @@ const Profile = () => {
                             </div>
                             
                             <div className="flex md:flex-col justify-between w-full md:w-auto items-center md:items-end gap-3 pt-4 md:pt-0 border-t md:border-t-0 border-gray-50">
+                                {/* 🟢 SƏNİN İSTƏDİYİN "OFFICE" STATUS BİDLİRİŞİ */}
                                 <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
                                     booking.status === 'pending' 
-                                    ? 'bg-yellow-50 text-yellow-600 border-yellow-100' 
+                                    ? 'bg-amber-50 text-amber-600 border-amber-100' 
                                     : 'bg-green-50 text-green-600 border-green-100'
                                 }`}>
-                                    {booking.status}
+                                    {booking.status === 'pending' ? 'Visit Office to Approve' : booking.status}
                                 </div>
                                 <span className="text-3xl font-black text-black tracking-tighter">${booking.total_price}</span>
                             </div>
                         </div>
                     ))
                 ) : (
-                    <div className="py-24 text-center bg-[#F5F5F7] rounded-[3rem] border-2 border-dashed border-gray-200">
+                    <div className="py-24 text-center bg-white rounded-[3rem] border border-gray-100 shadow-sm">
                         <div className="text-5xl mb-4 grayscale opacity-30">🏎️</div>
                         <p className="text-[#86868B] font-black text-xl uppercase tracking-tighter">No active rentals found.</p>
                         <p className="text-gray-400 text-xs font-medium mt-1">Your current driving sessions will appear here.</p>

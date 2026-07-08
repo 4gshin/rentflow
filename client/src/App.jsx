@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { Toaster } from 'react-hot-toast';
-import axios from 'axios';
+import axios from 'react-hot-toast'; 
+import axiosActual from 'axios'; // Real axios instansiyası
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -30,17 +31,25 @@ function App() {
     if (dropdownOpen && token) {
       const fetchDropdownData = async () => {
         try {
-          const profRes = await axios.get('http://localhost:5002/api/users/profile', {
+          const profRes = await axiosActual.get('http://localhost:5002/api/users/profile', {
             headers: { Authorization: `Bearer ${token}` }
           });
           setProfileData(profRes.data);
 
-          const bookRes = await axios.get('http://localhost:5002/api/bookings/my', {
+          const bookRes = await axiosActual.get('http://localhost:5002/api/bookings/my', {
             headers: { Authorization: `Bearer ${token}` }
           });
           
-          // 🔴 Filter: Yalnız keçmiş və ya tamamlanmış avtoları dropdown-a salırıq
-          const past = bookRes.data.filter(b => b.status === 'completed' || b.status === 'rejected');
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          // 🔴 SMART FILTER: Statusu completed/rejected olanlar VƏ YA tarixi artıq keçmiş olan bütün rentləri bura yığırıq
+          const past = bookRes.data.filter(b => {
+            const isFinishedStatus = b.status === 'completed' || b.status === 'rejected';
+            const isPastDate = new Date(b.end_date) < today;
+            return isFinishedStatus || isPastDate;
+          });
+          
           setPastBookings(past);
         } catch (err) {
           console.error("Dropdown data error:", err);
@@ -131,18 +140,16 @@ function App() {
               </div>
             )}
 
-            {/* 💳 YUXARI SAĞ FACE CARD DROPDOWN */}
+            {/* 💳 FACE CARD DROPDOWN */}
             {dropdownOpen && (
               <div className="absolute right-0 top-14 w-80 bg-white rounded-[2rem] shadow-2xl border border-gray-100 p-6 z-50 flex flex-col space-y-5 animate-in fade-in slide-in-from-top-3 duration-200">
                 
-                {/* Driver Info: Ad Soyad & Mail */}
                 <div className="pb-3 border-b border-gray-50 flex flex-col space-y-0.5">
                   <span className="text-[9px] font-black uppercase tracking-[0.15em] text-[#0071E3]">Premium Member</span>
                   <h4 className="text-lg font-black tracking-tight text-[#1D1D1F]">{profileData?.full_name || user?.full_name}</h4>
                   <p className="text-xs text-gray-400 font-medium tracking-tight">{profileData?.email || user?.email}</p>
                 </div>
 
-                {/* Keçmiş Avtolar */}
                 <div className="flex flex-col space-y-3">
                   <h5 className="text-[9px] font-black uppercase tracking-widest text-gray-400">Past Rentals</h5>
                   
