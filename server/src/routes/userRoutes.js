@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { registerUser, loginUser, getProfile, updateProfile } = require('../controllers/userController');
-const { protect } = require('../middleware/authMiddleware'); // 👈 Səndə fərqlidirsə, adını düzəlt (məs: verifyToken)
-
+const { protect } = require('../middlewares/authMiddleware');
 // Authentication
 router.post('/register', registerUser);
 router.post('/login', loginUser); 

@@ -1,0 +1,29 @@
+@layer utilities {
+  /* Apple Stilində Şüşə Effekti */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  /* Sürüşmə animasiyası */
+  .animate-fade-in {
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bütün ana düymələrə lüks klik hissi verən qlobal keçid */
+button, a {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
