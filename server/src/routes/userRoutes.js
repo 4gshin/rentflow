@@ -11,3 +11,6 @@ router.get('/profile', protect, getProfile);  // Profil məlumatlarını çəkm�
 router.put('/profile', protect, updateProfile);  // Profil məlumatlarını yeniləmək üçün
 
 module.exports = router;
+
+
+

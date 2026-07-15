@@ -18,7 +18,6 @@ const About = () => {
                 </p>
             </section>
 
-            {/* Core Pillars - Geniş və Minimalist Bloklar (Grid Yoxdur) */}
             <section className="px-6 max-w-4xl mx-auto space-y-24 pb-32">
                 
                 <div className="border-t border-gray-100 pt-8 flex flex-col sm:flex-row justify-between items-start gap-6">
@@ -50,7 +49,6 @@ const About = () => {
 
             </section>
 
-            {/* Sənin Bəyəndiyin O Möhtəşəm Vurucu Sonluq */}
             <section className="py-40 bg-[#1D1D1F] text-white px-6 text-center">
                 <div className="max-w-4xl mx-auto space-y-6">
                     <blockquote className="text-3xl sm:text-5xl font-black tracking-tighter leading-tight italic">

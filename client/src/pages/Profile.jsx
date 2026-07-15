@@ -21,7 +21,6 @@ const Profile = () => {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0); // Saatı sıfırlayırıq ki, düzgün müqayisə getsin
 
-                // 🔴 SMART FILTER: Yalnız statusu pending/approved olan VƏ bitmə tarixi bu gündən sonra olanları saxlayırıq
                 const active = res.data.filter(b => {
                     const isPendingOrApproved = b.status === 'pending' || b.status === 'approved';
                     const isFutureRental = new Date(b.end_date) >= today;
@@ -68,7 +67,6 @@ const Profile = () => {
                             </div>
                             
                             <div className="flex md:flex-col justify-between w-full md:w-auto items-center md:items-end gap-3 pt-4 md:pt-0 border-t md:border-t-0 border-gray-50">
-                                {/* 🟢 SƏNİN İSTƏDİYİN "OFFICE" STATUS BİDLİRİŞİ */}
                                 <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${
                                     booking.status === 'pending' 
                                     ? 'bg-amber-50 text-amber-600 border-amber-100' 

@@ -51,9 +51,7 @@ const Home = () => {
     return (
         <div className="min-h-screen bg-[#FBFBFD]">
             
-            {/* 🌌 HERO HOMEPAGE SECTION (APPLE STYLE) */}
             <section className="min-h-[calc(100vh-4rem)] flex flex-col justify-center items-center text-center px-6 relative overflow-hidden bg-gradient-to-b from-white via-[#FBFBFD] to-[#F5F5F7]">
-                {/* Arxa fonda minimalist dizayn effekti */}
                 <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
                 
                 <div className="relative z-10 max-w-4xl mx-auto space-y-6">
@@ -85,7 +83,6 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* 🏎️ FLEET SECTION (MÖVCUD SİSTEM) */}
             <div ref={fleetRef} className="px-6 max-w-7xl mx-auto pt-20">
                 {errorMessage && (
                     <div className="max-w-4xl mx-auto mb-8 bg-red-50 border border-red-100 text-red-600 p-6 rounded-3xl text-center font-bold text-sm">

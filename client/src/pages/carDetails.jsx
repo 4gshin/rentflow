@@ -22,8 +22,6 @@ const CarDetails = () => {
                 const carRes = await axios.get(`http://localhost:5002/api/cars/${id}`);
                 setCar(carRes.data);
 
-                // Bu maşın üçün artıq mövcud olan bron tarixlərini çəkək
-                // QEYD: Backend-də bunun üçün endpoint olmalıdır, yoxdursa ümumi bookings-dən filterlə
                 const bookingsRes = await axios.get(`http://localhost:5002/api/bookings/car/${id}`);
                 
                 const dates = [];
